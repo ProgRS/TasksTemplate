@@ -18,8 +18,11 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private val securityPreferences = SecurityPreferences(application.applicationContext)
 
 
-    private val  _login =  MutableLiveData<ValidationModel>()
+    private val _login = MutableLiveData<ValidationModel>()
     val login: LiveData<ValidationModel> = _login
+
+    private val _loggedUser = MutableLiveData<Boolean>()
+    val loggedUser: LiveData<Boolean> = _loggedUser
 
 
     /**
@@ -30,7 +33,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         personRepository.login(email, password, object : APIListener<PersonModel> {
             override fun onSuccess(result: PersonModel) {
 
-                     //VERIFICAR
+                //VERIFICAR
                 securityPreferences.store(TaskConstants.SHARED.TOKEN_KEY, result.token)
                 securityPreferences.store(TaskConstants.SHARED.PERSON_KEY, result.personKey)
                 securityPreferences.store(TaskConstants.SHARED.PERSON_NAME, result.name)
@@ -41,7 +44,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             override fun onFailure(message: String) {
-                    _login.value = ValidationModel(message)
+                _login.value = ValidationModel(message)
             }
 
 
@@ -52,6 +55,13 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
      * Verifica se usuário está logado
      */
     fun verifyLoggedUser() {
+
+        val token = securityPreferences.get(TaskConstants.SHARED.TOKEN_KEY)
+        val person = securityPreferences.get(TaskConstants.SHARED.PERSON_KEY)
+
+        RetrofitClient.addHeaders(token, person)
+
+        _loggedUser.value = (token != "" && person != "")
     }
 
 }
