@@ -16,6 +16,9 @@ class TaskListViewModel(application: Application) : AndroidViewModel(application
      private   val taskRepository = TaskRepository(application.applicationContext)
      private val priorityRepository = PriorityRepository(application.applicationContext)
 
+    private val _delete = MutableLiveData<ValidationModel>()
+    val delete: LiveData<ValidationModel> = _delete
+
     private val _tasks = MutableLiveData<List<TaskModel>>()
     val tasks: LiveData<List<TaskModel>> = _tasks
 
@@ -35,6 +38,20 @@ class TaskListViewModel(application: Application) : AndroidViewModel(application
             }
 
         })
+    }
+
+    fun delete(id: Int){
+        taskRepository.delete(id, object : APIListener<Boolean>{
+            override fun onSuccess(result: Boolean) {
+                list()
+            }
+
+            override fun onFailure(message: String) {
+                    _delete.value = ValidationModel(message)
+            }
+
+        })
+
     }
 
 }
