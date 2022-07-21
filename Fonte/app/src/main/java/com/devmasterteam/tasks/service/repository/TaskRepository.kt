@@ -41,11 +41,27 @@ class TaskRepository( context: Context) : BaseRepository(context){
 
     }
 
+    fun update(task: TaskModel,listener:APIListener<Boolean>){
+        val call =
+            remote.update(task.id,  task.priorityId, task.description, task.dueDate, task.complete)
+        executeCall(call, listener)
+
+    }
+
+    fun load(id: Int, listener: APIListener<TaskModel>){
+
+        executeCall(remote.load(id), listener)
+
+    }
+
+
     fun delete(id: Int, listener: APIListener<Boolean>){
 
         executeCall(remote.delete(id), listener)
 
     }
+
+
 
     fun complete(id: Int, listener: APIListener<Boolean>){
 
